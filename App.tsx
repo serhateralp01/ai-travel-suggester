@@ -6,7 +6,7 @@ import { ErrorDisplay } from './components/ErrorDisplay';
 import { PlaneIcon } from './components/icons/PlaneIcon';
 import { getTravelSuggestions } from './services/openaiService';
 import { UserPreferences, DestinationSuggestion, SavedSearch } from './src/types';
-import { DEFAULT_PREFERENCES } from './constants';
+import { DEFAULT_PREFERENCES } from './src/constants';
 
 const App: React.FC = () => {
   const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES);
