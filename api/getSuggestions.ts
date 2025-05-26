@@ -1,6 +1,30 @@
 import OpenAI from 'openai';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import type { UserPreferences, DestinationSuggestion } from '../src/types';
+
+// Duplicating type definitions here to resolve persistent import issues
+interface UserPreferences {
+  holidayType: string;
+  budget: string;
+  companions: string;
+  climate: string;
+  interests: string;
+  duration: string;
+  travelMonth?: string;
+}
+
+interface DestinationSuggestion {
+  name: string;
+  description: string;
+  matchReason: string;
+  detailedReasoning: string;
+  suitability: string;
+  imageUrl: string; 
+  imageSearchQuery?: string;
+  googleMapsUrl: string;
+  tripAdvisorUrl: string;
+  nearestAirports: string;
+}
+// End of duplicated type definitions
 
 // Ensure you have OPENAI_API_KEY set in your Vercel project's environment variables
 const API_KEY = process.env.OPENAI_API_KEY;
@@ -36,21 +60,18 @@ export default async function handler(
   const model = 'gpt-4o-mini';
 
   const prompt = `
-You are an expert travel advisor. Based on the following user preferences, suggest 5 DIVERSE and DISTINCT travel destinations.
-Consider the typical weather and events for the specified travel month if provided. If "Any" month is selected, use general suitability based on typical best times to visit considering the other preferences.
-It is crucial that each suggestion is unique and offers a different type of experience or geographical focus, even if some core preferences overlap.
-Aim for a global spread where appropriate, including Europe, Asia, the Americas, Africa, and Oceania.
-Challenge yourself to include at least one or two "off-the-beaten-path" or less obvious options that are still highly relevant and accurate matches.
-Deeply interpret the combination of user preferences to find destinations that truly shine for that specific mix.
+You are an expert travel advisor. Your primary goal is to provide 5 EXTREMELY DIVERSE and UNIQUE travel destinations based on the user's preferences. Actively avoid common or overly similar suggestions. Challenge yourself to find truly distinct options, considering different continents, cultures, and activity types where appropriate, even if preferences are narrow.
+
+Consider the typical weather and events for the specified travel month if provided. If "Any" month is selected, use general suitability based on typical best times to visit considering the other preferences. Emphasize how the chosen month impacts the experience (e.g., festivals, seasonal activities, weather advantages/disadvantages).
 
 For each destination, provide:
 1.  "name": The name of the destination (e.g., "Paris, France", "Kyoto, Japan").
-2.  "description": A compelling, brief description of the destination (2-3 sentences).
-3.  "matchReason": A concise, single-sentence explanation of why this specific destination is an accurate initial match for the user's exact preferences. Be specific.
-4.  "detailedReasoning": More in-depth valuable comments (2-3 sentences) explaining specific aspects that make it a great choice. Clearly articulate how unique features of the destination directly address MULTIPLE user preferences. Avoid generic statements.
-5.  "suitability": A qualitative assessment of how well the destination matches (e.g., "Excellent Match", "Strong Contender", "Unique Gem", "Good Alternative").
-6.  "imageUrl": A placeholder image URL using Picsum Photos. Format it as "https://picsum.photos/seed/DESTINATION_NAME_SLUG/600/400", where DESTINATION_NAME_SLUG is a URL-friendly version of the destination name (e.g., for "Bali, Indonesia", use "bali-indonesia").
-7.  "imageSearchQuery": A short string of 2-4 ideal keywords for finding representative images of this destination on Google Images (e.g., "Eiffel Tower Paris night", "Kyoto Arashiyama bamboo forest").
+2.  "description": A compelling, brief description of the destination (2-3 sentences), highlighting what makes it unique.
+3.  "matchReason": A concise, single-sentence explanation of why this specific destination is an accurate and *unique* initial match for the user's exact preferences. Be specific about the differentiating factors.
+4.  "detailedReasoning": More in-depth valuable comments (2-3 sentences) explaining specific aspects that make it a great choice. Clearly articulate how unique features of the destination directly address MULTIPLE user preferences. Avoid generic statements. Reinforce the uniqueness.
+5.  "suitability": A qualitative assessment (e.g., "Excellent Unique Match", "Strong Offbeat Contender", "Hidden Gem Choice").
+6.  "imageSearchQuery": A highly specific string of 3-5 keywords for finding iconic and representative images of THIS EXACT destination on Google Images. Focus on recognizable landmarks, activities, or natural features (e.g., "Eiffel Tower night illumination Paris", "Arashiyama Bamboo Grove Kyoto sunny day", "Serengeti Great Migration safari jeep"). These keywords will also be used to try and generate a more relevant Picsum URL, so make them descriptive.
+7.  "imageUrl": A placeholder image URL. Generate this using Picsum Photos, but make the seed VERY SPECIFIC using a slug derived from the imageSearchQuery. Format: "https://picsum.photos/seed/SLUG_FROM_IMAGE_SEARCH_QUERY/600/400". For example, if imageSearchQuery is "Eiffel Tower night Paris", the slug could be "eiffel-tower-night-paris".
 8.  "nearestAirports": A string listing 1-3 major international or well-connected regional airports, including their IATA codes (e.g., "Paris Charles de Gaulle (CDG), Paris Orly (ORY)", "Tokyo Narita (NRT), Tokyo Haneda (HND)").
 
 User Preferences:
@@ -69,20 +90,17 @@ Return your response as a valid JSON array of 5 objects. Each object must repres
   "matchReason": "string",
   "detailedReasoning": "string",
   "suitability": "string",
-  "imageUrl": "string",
   "imageSearchQuery": "string",
+  "imageUrl": "string", 
   "nearestAirports": "string"
 }
 
 CRITICAL INSTRUCTIONS:
 - The response MUST be ONLY the JSON array string. No text, comments, or markdown before or after it.
 - The JSON must be well-formed, complete, and directly usable. All strings must be properly escaped.
-- Generate ALL 5 distinct suggestions. Do not repeat destinations or offer overly similar options.
+- Generate ALL 5 distinct and unique suggestions. Do not repeat destinations or offer overly similar options. Prioritize variety above all else, while still matching preferences.
 - Ensure the entire JSON response, including all 5 objects and all closing brackets and commas, is provided without any truncation or malformation.
-- Accuracy and specificity in reasoning are paramount.
-Example for imageUrl: if name is "Kyoto, Japan", imageUrl should be "https://picsum.photos/seed/kyoto-japan/600/400".
-The "detailedReasoning" should provide genuine, specific insights. The "suitability" should reflect a thoughtful assessment.
-The "nearestAirports" should be practical for travelers.
+- Accuracy and specificity in reasoning and keywords are paramount.
 `;
 
   try {
@@ -90,7 +108,7 @@ The "nearestAirports" should be practical for travelers.
       model: model,
       messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" },
-      temperature: 0.7,
+      temperature: 0.85, // Increased temperature slightly for more diverse suggestions
     });
 
     const jsonText = completion.choices[0]?.message?.content?.trim();
@@ -124,16 +142,18 @@ The "nearestAirports" should be practical for travelers.
         typeof item.matchReason === 'string' &&
         typeof item.detailedReasoning === 'string' &&
         typeof item.suitability === 'string' &&
-        typeof item.imageUrl === 'string' &&
         typeof item.imageSearchQuery === 'string' &&
+        typeof item.imageUrl === 'string' &&
         typeof item.nearestAirports === 'string'
       )) {
         const suggestionsWithFullUrls = parsedData.map((item: any) => {
           const destinationNameEncoded = encodeURIComponent(item.name);
+          // Generate slug from the more specific imageSearchQuery for Picsum
+          const picsumSlug = generateSlug(item.imageSearchQuery || item.name); 
           return {
             ...item,
-            imageUrl: `https://picsum.photos/seed/${generateSlug(item.name)}/600/400`,
-            imageSearchQuery: item.imageSearchQuery,
+            imageUrl: `https://picsum.photos/seed/${picsumSlug}/600/400`,
+            imageSearchQuery: item.imageSearchQuery, 
             googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${destinationNameEncoded}`,
             tripAdvisorUrl: `https://www.tripadvisor.com/Search?q=${destinationNameEncoded}`
           } as DestinationSuggestion;
