@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { DestinationSuggestion, UserPreferences, SavedSearch } from './types';
 // ... (other imports: PreferenceForm, DestinationCard, Icons, etc.)
-import { PreferenceForm } from './components/PreferenceForm';
+import { PreferenceForm } from '../components/PreferenceForm';
 import { DestinationCard } from './components/DestinationCard';
-import { SaveIcon, TrashIcon, HeartIcon, RefreshCwIcon, ListIcon, XIcon, ArrowRightIcon } from './components/icons/AppIcons'; // Assuming you have these
+import { SaveIcon, TrashIcon, HeartIcon, RefreshCwIcon, ListIcon, XIcon, ArrowRightIcon } from '../components/icons/AppIcons'; // Assuming you have these
 
 const API_URL = '/api/getSuggestions';
 
@@ -126,6 +126,7 @@ const App: React.FC = () => {
   };
 
   const handleToggleExpand = (suggestionId: string) => {
+    console.log("App.tsx: Toggling expand for suggestion ID:", suggestionId); // Diagnostic log
     setExpandedCardId(prevId => (prevId === suggestionId ? null : suggestionId));
   };
 

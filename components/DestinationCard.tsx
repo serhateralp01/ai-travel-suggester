@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DestinationSuggestion } from '../src/types';
-import { BlurHashImage } from './BlurHashImage'; // Import the new component
+// import { BlurHashImage } from './BlurHashImage'; // Import the new component
 // import { ExternalLinkIcon } from './icons/ExternalLinkIcon'; // We will define a simple one here
 // import { MapPinIcon, GlobeAltIcon, BuildingLibraryIcon } from './icons/SuggestionCardIcons'; // Placeholder for now
 
@@ -13,39 +13,17 @@ const ExternalLinkIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 );
 
 // Placeholder for SuggestionCardIcons - create these in components/icons/SuggestionCardIcons.tsx
-const MapPinIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props}><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>; // Example simple path
+const MapPinIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a5 5 0 00-5 5c0 4.18 5 9.5 5 9.5s5-5.32 5-9.5a5 5 0 00-5-5zm0 7.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>;
 const BuildingLibraryIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props}><path d="M4 6H2v14h2V6zm3 0H5v14h2V6zm3 0H8v14h2V6zm3 0h-2v14h2V6zm3 0h-2v14h2V6zm3 0h-2v14h2V6zm3 0h-2v14h2V6zM1 22h22v-2H1v2zM12 2L2 7v2h20V7L12 2z"/></svg>; // Example simple path
 
 // --- Icon Definitions ---
-const SuitabilityIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" {...props}>
-    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.06 0l4.009-5.5z" clipRule="evenodd" />
-  </svg>
-);
-
-const AirportIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" {...props}>
-    <path d="M3.5 9.564c0-1.089.49-1.991 1.237-2.608a3.501 3.501 0 014.877-4.043L14.936.59A1 1 0 0116.5 1.43l-2.3 4.601a3.5 3.5 0 01-4.23 2.92L3.5 9.564zM2.98 10.064a4.5 4.5 0 006.053 4.485l5.968 2.984a1 1 0 001.24-.22l1.468-2.446a1 1 0 00-.305-1.353l-5.968-2.984a4.501 4.501 0 00-6.131-3.653L2.98 10.064z" />
-  </svg>
-);
-
-const ChevronDownIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" {...props}>
-    <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-  </svg>
-);
-
-const ChevronUpIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" {...props}>
-    <path fillRule="evenodd" d="M14.77 12.79a.75.75 0 01-1.06-.02L10 8.832l-3.71 3.938a.75.75 0 11-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" clipRule="evenodd" />
-  </svg>
-);
-
-const RefinedExternalLinkIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 ml-1.5" {...props}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-  </svg>
-);
+const SuitabilityIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.06 0l4.009-5.5z" clipRule="evenodd" /></svg>;
+const AirportIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} fill="currentColor" viewBox="0 0 20 20"><path d="M18.587 8.32l-5.731-2.651A3.502 3.502 0 008.303.88L3.09 3.135a1 1 0 00-.675 1.244l1.868 4.024a3.501 3.501 0 006.465 1.222l6.25-2.89a1 1 0 00.286-1.511zM3.668 11.003a4.502 4.502 0 006.174 3.846l4.855 2.246a1 1 0 001.33-.33l1.075-1.976a1 1 0 00-.424-1.325l-4.855-2.246a4.502 4.502 0 00-5.84-3.388l-2.315 1.173z"/></svg>;
+const ChevronDownIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" /></svg>;
+const ChevronUpIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M14.77 12.79a.75.75 0 01-1.06-.02L10 8.832l-3.71 3.938a.75.75 0 11-1.08-1.04l4.25-4.5a.75.75 0 011.08 0l4.25 4.5a.75.75 0 01-.02 1.06z" clipRule="evenodd" /></svg>;
+const RefinedExternalLinkIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24" ><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>;
+const InfoIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>;
+const DescriptionIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zM2 9.75A.75.75 0 012.75 9h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 9.75z" clipRule="evenodd" /></svg>; // Placeholder for description
 
 interface DestinationCardProps {
   suggestion: DestinationSuggestion;
@@ -55,10 +33,7 @@ interface DestinationCardProps {
 
 export const DestinationCard: React.FC<DestinationCardProps> = ({ suggestion, isExpanded, onToggleExpand }) => {
   const [isDetailedReasoningExpandedInternally, setIsDetailedReasoningExpandedInternally] = useState(false);
-  const googleImageSearchUrl = suggestion.imageSearchQuery 
-    ? `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(suggestion.imageSearchQuery)}` 
-    : `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(suggestion.name + " landscape scenery travel")}`;
-
+  
   const renderListItem = (IconComponent: React.ElementType, label: string, value: string | undefined, isBadge: boolean = false) => (
     value ? (
       <div className="flex items-start text-sm mb-1.5">
@@ -76,80 +51,64 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({ suggestion, is
   );
 
   if (!isExpanded) {
-    // COLLAPSED STATE: Small, wide card
     return (
       <button
         onClick={onToggleExpand}
         aria-expanded="false"
         aria-label={`View details for ${suggestion.name}`}
-        className="w-full text-left bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:bg-slate-700/90 hover:shadow-sky-600/40 ring-1 ring-slate-700/50 hover:ring-sky-500/70 flex items-center p-4 space-x-4 group"
+        className="w-full text-left bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:bg-slate-700/90 hover:shadow-sky-600/40 ring-1 ring-slate-700/50 hover:ring-sky-500/70 flex flex-col p-5 space-y-3 group"
       >
-        <div className="flex-shrink-0">
-          <BlurHashImage 
-            src={suggestion.imageUrl}
-            blurHash={suggestion.blurHash}
-            alt={`Thumbnail of ${suggestion.name}`}
-            className="w-28 h-20 object-cover rounded-md ring-1 ring-slate-600/50 group-hover:ring-sky-500/80 transition-all duration-300"
-            hashWidth={32}
-            hashHeight={20} // Adjusted for a 16:10 aspect ratio (approx for w-28 h-20)
-          />
+        <div className="flex justify-between items-start">
+          <h3 className="text-xl font-bold text-sky-400 group-hover:text-sky-300 transition-colors duration-300 tracking-tight" title={suggestion.name}>{suggestion.name}</h3>
+          <InfoIcon className="w-7 h-7 text-sky-500/70 group-hover:text-sky-400 group-hover:scale-105 transition-all duration-300 shrink-0" />
         </div>
-        <div className="flex-grow">
-          <h3 className="text-lg font-bold text-sky-400 group-hover:text-sky-300 transition-colors duration-300 tracking-tight truncate" title={suggestion.name}>{suggestion.name}</h3>
-          {suggestion.suitability && (
-            <span className="mt-1 mb-1.5 inline-block bg-sky-600/50 text-sky-200 px-2 py-0.5 rounded-full text-xs font-medium tracking-wide group-hover:bg-sky-500/60 transition-colors duration-300">
+        
+        {suggestion.suitability && (
+            <span className="inline-block bg-sky-600/60 text-sky-100 px-3 py-1 rounded-full text-sm font-medium tracking-wide group-hover:bg-sky-500/70 transition-colors duration-300 self-start">
               {suggestion.suitability}
             </span>
-          )}
-          <p className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors duration-300 line-clamp-2 leading-snug">
-            {suggestion.description} 
-          </p>
-        </div>
-        <div className="flex-shrink-0 ml-auto pl-3">
-            <SuitabilityIcon className="w-8 h-8 text-sky-500/70 group-hover:text-sky-400 group-hover:scale-110 transition-all duration-300" />
-        </div>
+        )}
+        <p className="text-sm text-slate-300 group-hover:text-slate-200 transition-colors duration-300 line-clamp-3 leading-relaxed">
+          {suggestion.description} 
+        </p>
       </button>
     );
   }
 
-  // EXPANDED STATE: Full card details (similar to before)
+  // EXPANDED STATE
   return (
     <div className="bg-slate-800/90 backdrop-blur-sm rounded-xl shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-700/50 animate-fadeInUp">
-       {/* Button to collapse, styled differently or positioned if needed */}
-       <button onClick={onToggleExpand} aria-expanded="true" aria-label={`Hide details for ${suggestion.name}`} className="absolute top-4 right-4 z-10 p-2 bg-slate-700/50 hover:bg-sky-600/70 rounded-full text-sky-300 hover:text-white transition-all duration-200">
-        <ChevronUpIcon className="w-5 h-5" />
-      </button>
-      <BlurHashImage 
-        src={suggestion.imageUrl}
-        blurHash={suggestion.blurHash}
-        alt={`Scenic view of ${suggestion.name}`}
-        className="w-full h-52 md:h-64 object-cover" // Slightly taller image for expanded view
-        hashWidth={32}
-        hashHeight={16} // Adjusted for a wider aspect ratio if h-64 is wider
-      />
       <div className="p-6 flex flex-col flex-grow">
-        <h3 className="text-3xl font-bold text-sky-400 mb-3 tracking-tight">{suggestion.name}</h3>
+        <div className="flex justify-between items-start mb-3">
+            <h3 className="text-3xl font-bold text-sky-400 tracking-tight">{suggestion.name}</h3>
+            <button onClick={onToggleExpand} aria-expanded="true" aria-label={`Hide details for ${suggestion.name}`} className="p-2 -mr-2 -mt-2 bg-slate-700/50 hover:bg-sky-600/70 rounded-full text-sky-300 hover:text-white transition-all duration-200">
+                <ChevronUpIcon className="w-6 h-6" />
+            </button>
+        </div>
         
         <div className="mb-4 border-b border-slate-700 pb-4">
           {renderListItem(SuitabilityIcon, "Suitability", suggestion.suitability, true)}
           {renderListItem(AirportIcon, "Airports", suggestion.nearestAirports)}
         </div>
 
-        <p className="text-slate-300 text-sm mb-3 leading-relaxed">{suggestion.description}</p>
-        
+        <div className="flex items-start text-slate-300 mb-3 leading-relaxed">
+            <DescriptionIcon className="w-5 h-5 mr-2.5 text-sky-400 shrink-0 mt-1" />
+            <p><span className="font-semibold text-slate-200">Description:</span> {suggestion.description}</p>
+        </div>
+                
         {suggestion.matchReason && (
             <p className="text-sm text-slate-400 mb-4 italic bg-slate-700/40 p-3 rounded-md leading-relaxed">
                 <span className="font-semibold not-italic text-sky-400/80">Match Insight:</span> {suggestion.matchReason}
             </p>
         )}
         
-        {/* Internal toggle for detailedReasoning can remain if text is very long */}
         {suggestion.detailedReasoning && (
           <div className="mb-4">
-            <div className={`text-sm text-slate-300 overflow-hidden transition-all duration-300 ease-in-out ${isDetailedReasoningExpandedInternally ? 'max-h-[1000px]' : 'max-h-20 line-clamp-3'}`}> {/* Increased max-h for expanded state */} 
+            <h4 className="text-md font-semibold text-sky-300 mb-1.5">Detailed Reasoning:</h4>
+            <div className={`text-sm text-slate-300 overflow-hidden transition-all duration-300 ease-in-out ${isDetailedReasoningExpandedInternally ? 'max-h-[1000px]' : 'max-h-20 line-clamp-3'}`}> 
               {suggestion.detailedReasoning}
             </div>
-            {suggestion.detailedReasoning.length > 100 && ( // Show toggle if text is long enough
+            {suggestion.detailedReasoning.length > 100 && (
               <button 
                 onClick={() => setIsDetailedReasoningExpandedInternally(!isDetailedReasoningExpandedInternally)}
                 className="text-xs text-sky-400 hover:text-sky-300 mt-2 flex items-center font-medium group"
@@ -180,9 +139,8 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({ suggestion, is
         <div className="mt-auto pt-5 border-t border-slate-700 space-y-3">
           {[ { href: suggestion.googleMapsUrl, label: "View on Google Maps" },
              { href: suggestion.tripAdvisorUrl, label: "Explore on TripAdvisor" },
-             { href: googleImageSearchUrl, label: "Find Images on Google" }
           ].map(link => (
-            <a 
+            link.href && <a
               key={link.label}
               href={link.href} 
               target="_blank" 

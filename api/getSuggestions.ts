@@ -18,13 +18,10 @@ interface DestinationSuggestion {
   matchReason: string;
   detailedReasoning: string;
   suitability: string;
-  imageUrl: string; 
-  imageSearchQuery?: string;
   googleMapsUrl: string;
   tripAdvisorUrl: string;
   nearestAirports: string;
   mustDoActivities?: string[];
-  blurHash?: string | null;
 }
 // End of duplicated type definitions
 
@@ -34,31 +31,6 @@ const API_KEY = process.env.OPENAI_API_KEY;
 const openai = new OpenAI({
   apiKey: API_KEY,
 });
-
-interface FetchImageResponse {
-  imageUrl: string | null;
-  altText?: string | null;
-  blurHash?: string | null;
-}
-
-async function getUnsplashImageDetails(searchQuery: string, deploymentUrl: string): Promise<FetchImageResponse> {
-  const baseUrl = deploymentUrl.startsWith('localhost') ? `http://${deploymentUrl}` : `https://${deploymentUrl}`;
-  const fetchUrl = `${baseUrl}/api/fetchImage?query=${encodeURIComponent(searchQuery)}`;
-  
-  try {
-    const response = await fetch(fetchUrl);
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error(`Error fetching image details for query '${searchQuery}' from ${fetchUrl}: ${response.status}`, errorData);
-      return { imageUrl: null, blurHash: null }; 
-    }
-    const data = await response.json(); // Expecting { imageUrl: '...', altText: '...', blurHash: '...' }
-    return { imageUrl: data.imageUrl, altText: data.altText, blurHash: data.blurHash };
-  } catch (error) {
-    console.error(`Network or parsing error fetching image details for '${searchQuery}' from ${fetchUrl}:`, error);
-    return { imageUrl: null, blurHash: null }; 
-  }
-}
 
 export default async function handler(
   request: VercelRequest,
@@ -101,14 +73,12 @@ For the chosen travel month (${isSurprise ? 'you pick what makes sense for a sur
 
 For each destination, provide:
 1.  "name": The name of the destination.
-2.  "description": A compelling, evocative description (CONCISE: 1-2 sentences), highlighting what makes it unique and intriguing for THIS user (or for a surprise).
+2.  "description": A compelling, evocative description (NOW AIM FOR 2-3 sentences for better initial display without images), highlighting what makes it unique and intriguing for THIS user (or for a surprise).
 3.  "matchReason": A concise, single-sentence explanation of why this specific destination is an accurate and *particularly insightful or niche* match for the user's exact preferences (or why it's a great surprise given budget/companions). Justify its uniqueness.
-4.  "detailedReasoning": More in-depth valuable comments (CONCISE: 1-2 sentences). Clearly articulate how unique features of the destination directly address MULTIPLE user preferences (or the surprise criteria) and why it stands out as a recommendation. If it's an "off-the-beaten-path" suggestion, briefly explain what makes it so.
+4.  "detailedReasoning": More in-depth valuable comments (CONCISE: 2-3 sentences). Clearly articulate how unique features of the destination directly address MULTIPLE user preferences (or the surprise criteria) and why it stands out as a recommendation. If it's an "off-the-beaten-path" suggestion, briefly explain what makes it so.
 5.  "suitability": A qualitative assessment. For surprise mode, use terms like "Exciting Surprise!", "Unexpected Gem!", "Bold Adventure!". For normal mode, use terms like "Perfect Niche Pick", "Unique Cultural Gem", "Offbeat Adventure", "Exceptional Fit", "Hidden Beauty".
-6.  "imageSearchQuery": CRITICAL FOR HIGH-QUALITY, RELEVANT IMAGES. Provide 2-5 carefully chosen keywords for Unsplash. Think like an art director seeking an iconic, beautiful, and representative shot. Examples: "[Destination Name] iconic landmark sunny day", "[Destination Name] breathtaking landscape aerial view", "[Destination Name] vibrant street food night", "[Destination Name] serene beach turquoise water travel photography". Prioritize terms that evoke strong visual appeal and are likely to yield professional, high-resolution travel photos. Be specific to the destination's main appeal.
-7.  "imageUrl": Set this to an empty string (""). It will be populated by a different service later.
-8.  "nearestAirports": A string listing 1-3 major international or well-connected regional airports, including their IATA codes.
-9.  "mustDoActivities": An array of 2-3 short strings, each describing a key highlight or must-do activity/experience.
+6.  "nearestAirports": A string listing 1-3 major international or well-connected regional airports, including their IATA codes.
+7.  "mustDoActivities": An array of 2-3 short strings, each describing a key highlight or must-do activity/experience.
 
 User Preferences:
 - Budget: ${preferences.budget}
@@ -135,8 +105,6 @@ Return your response as a valid JSON array of 6 objects. Each object must repres
   "matchReason": "string",
   "detailedReasoning": "string",
   "suitability": "string",
-  "imageSearchQuery": "string",
-  "imageUrl": "",
   "nearestAirports": "string",
   "mustDoActivities": ["string", "string", "string"]
 }
@@ -188,38 +156,18 @@ CRITICAL INSTRUCTIONS:
         typeof item.matchReason === 'string' &&
         typeof item.detailedReasoning === 'string' &&
         typeof item.suitability === 'string' &&
-        typeof item.imageSearchQuery === 'string' &&
-        typeof item.imageUrl === 'string' &&
         typeof item.nearestAirports === 'string' &&
         (Array.isArray(item.mustDoActivities) && item.mustDoActivities.every((activity: any) => typeof activity === 'string'))
       )) {
-        
-        const host = request.headers['x-forwarded-host'] || request.headers['host'];
-        const deploymentUrl = host || process.env.VERCEL_URL || 'localhost:3000';
-
-        const suggestionsWithRealImages = await Promise.all(
-          parsedData.map(async (item: any) => {
-            let finalImageUrl = item.imageUrl; // AI provides empty string
-            let finalBlurHash = null;
-            
-            if (item.imageSearchQuery) {
-              const imageDetails = await getUnsplashImageDetails(item.imageSearchQuery, deploymentUrl as string);
-              if (imageDetails.imageUrl) {
-                finalImageUrl = imageDetails.imageUrl;
-                finalBlurHash = imageDetails.blurHash; // Capture blurHash
-              }
-            }
-            const destinationNameEncoded = encodeURIComponent(item.name);
-            return {
-              ...item,
-              imageUrl: finalImageUrl, 
-              blurHash: finalBlurHash, // Add blurHash to the final suggestion object
-              googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${destinationNameEncoded}`,
-              tripAdvisorUrl: `https://www.tripadvisor.com/Search?q=${destinationNameEncoded}`
-            } as DestinationSuggestion;
-          })
-        );
-        return response.status(200).json(suggestionsWithRealImages);
+        const suggestionsWithUrls = parsedData.map((item: any) => {
+          const destinationNameEncoded = encodeURIComponent(item.name);
+          return {
+            ...item,
+            googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${destinationNameEncoded}`,
+            tripAdvisorUrl: `https://www.tripadvisor.com/Search?q=${destinationNameEncoded}`
+          } as DestinationSuggestion;
+        });
+        return response.status(200).json(suggestionsWithUrls);
       }
       console.error("Parsed JSON is not an array of the expected DestinationSuggestion structure or is empty:", parsedData);
       const finishReason = completion.choices[0]?.finish_reason;
