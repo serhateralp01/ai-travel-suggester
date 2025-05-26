@@ -24,6 +24,7 @@ interface DestinationSuggestion {
   tripAdvisorUrl: string;
   nearestAirports: string;
   mustDoActivities?: string[];
+  blurHash?: string | null;
 }
 // End of duplicated type definitions
 
@@ -34,28 +35,28 @@ const openai = new OpenAI({
   apiKey: API_KEY,
 });
 
-// Helper function to call our new fetchImage API endpoint
-// Note: This assumes the Vercel app is deployed and accessible via its domain.
-// For local development, this needs to point to the local dev server (e.g., http://localhost:3000/api/fetchImage).
-// We will use a relative path for Vercel deployment.
-async function getUnsplashImageUrl(searchQuery: string, deploymentUrl: string): Promise<string | null> {
-  // In Vercel, process.env.VERCEL_URL gives the deployment URL (without https://)
-  // For local, you might need a different base or pass the full URL
+interface FetchImageResponse {
+  imageUrl: string | null;
+  altText?: string | null;
+  blurHash?: string | null;
+}
+
+async function getUnsplashImageDetails(searchQuery: string, deploymentUrl: string): Promise<FetchImageResponse> {
   const baseUrl = deploymentUrl.startsWith('localhost') ? `http://${deploymentUrl}` : `https://${deploymentUrl}`;
   const fetchUrl = `${baseUrl}/api/fetchImage?query=${encodeURIComponent(searchQuery)}`;
   
   try {
     const response = await fetch(fetchUrl);
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})); // try to get error details
-      console.error(`Error fetching image for query '${searchQuery}' from ${fetchUrl}: ${response.status}`, errorData);
-      return null; // Or a default placeholder
+      const errorData = await response.json().catch(() => ({}));
+      console.error(`Error fetching image details for query '${searchQuery}' from ${fetchUrl}: ${response.status}`, errorData);
+      return { imageUrl: null, blurHash: null }; 
     }
-    const data = await response.json();
-    return data.imageUrl; // Expecting { imageUrl: '...' }
+    const data = await response.json(); // Expecting { imageUrl: '...', altText: '...', blurHash: '...' }
+    return { imageUrl: data.imageUrl, altText: data.altText, blurHash: data.blurHash };
   } catch (error) {
-    console.error(`Network or parsing error fetching image for '${searchQuery}' from ${fetchUrl}:`, error);
-    return null; // Or a default placeholder
+    console.error(`Network or parsing error fetching image details for '${searchQuery}' from ${fetchUrl}:`, error);
+    return { imageUrl: null, blurHash: null }; 
   }
 }
 
@@ -104,7 +105,7 @@ For each destination, provide:
 3.  "matchReason": A concise, single-sentence explanation of why this specific destination is an accurate and *particularly insightful or niche* match for the user's exact preferences (or why it's a great surprise given budget/companions). Justify its uniqueness.
 4.  "detailedReasoning": More in-depth valuable comments (CONCISE: 1-2 sentences). Clearly articulate how unique features of the destination directly address MULTIPLE user preferences (or the surprise criteria) and why it stands out as a recommendation. If it's an "off-the-beaten-path" suggestion, briefly explain what makes it so.
 5.  "suitability": A qualitative assessment. For surprise mode, use terms like "Exciting Surprise!", "Unexpected Gem!", "Bold Adventure!". For normal mode, use terms like "Perfect Niche Pick", "Unique Cultural Gem", "Offbeat Adventure", "Exceptional Fit", "Hidden Beauty".
-6.  "imageSearchQuery": CRITICAL FOR IMAGE QUALITY. Provide a concise (2-4 keywords) but *highly effective and evocative* search query for Unsplash. Think like a photographer. Include terms that suggest beauty, iconic views, or the essence of the location (e.g., "[Destination Name] iconic view travel", "[Destination Name] serene landscape", "[Destination Name] vibrant culture"). Prioritize queries likely to yield high-quality, professional-looking travel photography.
+6.  "imageSearchQuery": CRITICAL FOR HIGH-QUALITY, RELEVANT IMAGES. Provide 2-5 carefully chosen keywords for Unsplash. Think like an art director seeking an iconic, beautiful, and representative shot. Examples: "[Destination Name] iconic landmark sunny day", "[Destination Name] breathtaking landscape aerial view", "[Destination Name] vibrant street food night", "[Destination Name] serene beach turquoise water travel photography". Prioritize terms that evoke strong visual appeal and are likely to yield professional, high-resolution travel photos. Be specific to the destination's main appeal.
 7.  "imageUrl": Set this to an empty string (""). It will be populated by a different service later.
 8.  "nearestAirports": A string listing 1-3 major international or well-connected regional airports, including their IATA codes.
 9.  "mustDoActivities": An array of 2-3 short strings, each describing a key highlight or must-do activity/experience.
@@ -193,23 +194,26 @@ CRITICAL INSTRUCTIONS:
         (Array.isArray(item.mustDoActivities) && item.mustDoActivities.every((activity: any) => typeof activity === 'string'))
       )) {
         
-        // Determine the deployment URL for internal API calls
         const host = request.headers['x-forwarded-host'] || request.headers['host'];
-        const deploymentUrl = host || process.env.VERCEL_URL || 'localhost:3000'; // Fallback for local
+        const deploymentUrl = host || process.env.VERCEL_URL || 'localhost:3000';
 
         const suggestionsWithRealImages = await Promise.all(
           parsedData.map(async (item: any) => {
-            let imageUrl = item.imageUrl; // Start with AI-provided (Picsum) placeholder
+            let finalImageUrl = item.imageUrl; // AI provides empty string
+            let finalBlurHash = null;
+            
             if (item.imageSearchQuery) {
-              const unsplashUrl = await getUnsplashImageUrl(item.imageSearchQuery, deploymentUrl as string);
-              if (unsplashUrl) {
-                imageUrl = unsplashUrl;
+              const imageDetails = await getUnsplashImageDetails(item.imageSearchQuery, deploymentUrl as string);
+              if (imageDetails.imageUrl) {
+                finalImageUrl = imageDetails.imageUrl;
+                finalBlurHash = imageDetails.blurHash; // Capture blurHash
               }
             }
             const destinationNameEncoded = encodeURIComponent(item.name);
             return {
               ...item,
-              imageUrl: imageUrl, // Now updated with Unsplash URL if successful
+              imageUrl: finalImageUrl, 
+              blurHash: finalBlurHash, // Add blurHash to the final suggestion object
               googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${destinationNameEncoded}`,
               tripAdvisorUrl: `https://www.tripadvisor.com/Search?q=${destinationNameEncoded}`
             } as DestinationSuggestion;

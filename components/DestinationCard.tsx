@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { DestinationSuggestion } from '../src/types';
+import { BlurHashImage } from './BlurHashImage'; // Import the new component
 // import { ExternalLinkIcon } from './icons/ExternalLinkIcon'; // We will define a simple one here
 // import { MapPinIcon, GlobeAltIcon, BuildingLibraryIcon } from './icons/SuggestionCardIcons'; // Placeholder for now
 
@@ -74,18 +75,13 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({ suggestion }) 
 
   return (
     <div className="bg-slate-800/90 backdrop-blur-sm rounded-xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300 hover:shadow-sky-600/60 ring-1 ring-slate-700/50 hover:ring-sky-500/70">
-      <img 
-        src={suggestion.imageUrl} 
+      <BlurHashImage 
+        src={suggestion.imageUrl}
+        blurHash={suggestion.blurHash}
         alt={`Scenic view of ${suggestion.name}`}
-        className="w-full h-52 object-cover transition-transform duration-300 ease-in-out group-hover:scale-105" // group-hover for potential future use if card is a group
-        onError={(e) => { 
-          (e.target as HTMLImageElement).style.display = 'none'; 
-          const placeholder = document.createElement('div');
-          placeholder.className = 'w-full h-52 bg-slate-700 flex items-center justify-center text-slate-500';
-          placeholder.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 opacity-50"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>';
-          const parent = (e.target as HTMLImageElement).parentNode;
-          if (parent) parent.insertBefore(placeholder, (e.target as HTMLImageElement));
-        }}
+        className="w-full h-52 object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+        hashWidth={32}
+        hashHeight={20}
       />
       <div className="p-6 flex flex-col flex-grow">
         <h3 className="text-2xl font-bold text-sky-400 mb-3 tracking-tight">{suggestion.name}</h3>

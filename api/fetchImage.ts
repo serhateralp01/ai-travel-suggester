@@ -53,7 +53,22 @@ export default async function handler(
     const photo = result.response?.results[0];
 
     if (photo) {
-      return response.status(200).json({ imageUrl: photo.urls.regular, altText: photo.alt_description || query });
+      // Optimize image URL
+      let optimizedImageUrl = photo.urls.regular; // Start with regular
+      // Append parameters for better quality and specific sizing for the card
+      // Assuming card image display area is landscape, approx 400px wide, 208px tall (h-52)
+      const imageParams = '&w=450&h=220&fit=crop&auto=format&q=75'; 
+      if (optimizedImageUrl.includes('?')) { // Check if URL already has params
+        optimizedImageUrl += imageParams;
+      } else {
+        optimizedImageUrl += `?${imageParams.substring(1)}`;
+      }
+
+      return response.status(200).json({ 
+        imageUrl: optimizedImageUrl, 
+        altText: photo.alt_description || query,
+        blurHash: photo.blur_hash || null
+      });
     } else {
       // Fallback or generic image if no results - or let the main API handle a fallback
       console.warn(`No Unsplash image found for query: ${query}`);

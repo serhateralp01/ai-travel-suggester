@@ -20,6 +20,7 @@ export interface DestinationSuggestion {
   tripAdvisorUrl: string;
   nearestAirports: string; // e.g., "London Heathrow (LHR), London Gatwick (LGW)"
   mustDoActivities?: string[]; // New field
+  blurHash?: string | null; // Added blurHash
 }
 
 export interface SelectOption {
