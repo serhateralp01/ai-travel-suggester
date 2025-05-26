@@ -1,0 +1,6 @@
+{
+  "name": "AI Travel Suggester",
+  "description": "Get personalized travel destination suggestions based on your preferences, powered by AI.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
