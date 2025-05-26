@@ -100,9 +100,9 @@ For the chosen travel month (${isSurprise ? 'you pick what makes sense for a sur
 
 For each destination, provide:
 1.  "name": The name of the destination.
-2.  "description": A compelling, evocative description (2-3 sentences), highlighting what makes it unique and intriguing for THIS user (or for a surprise).
+2.  "description": A compelling, evocative description (CONCISE: 1-2 sentences), highlighting what makes it unique and intriguing for THIS user (or for a surprise).
 3.  "matchReason": A concise, single-sentence explanation of why this specific destination is an accurate and *particularly insightful or niche* match for the user's exact preferences (or why it's a great surprise given budget/companions). Justify its uniqueness.
-4.  "detailedReasoning": More in-depth valuable comments (2-3 sentences). Clearly articulate how unique features of the destination directly address MULTIPLE user preferences (or the surprise criteria) and why it stands out as a recommendation. If it's an "off-the-beaten-path" suggestion, briefly explain what makes it so.
+4.  "detailedReasoning": More in-depth valuable comments (CONCISE: 1-2 sentences). Clearly articulate how unique features of the destination directly address MULTIPLE user preferences (or the surprise criteria) and why it stands out as a recommendation. If it's an "off-the-beaten-path" suggestion, briefly explain what makes it so.
 5.  "suitability": A qualitative assessment. For surprise mode, use terms like "Exciting Surprise!", "Unexpected Gem!", "Bold Adventure!". For normal mode, use terms like "Perfect Niche Pick", "Unique Cultural Gem", "Offbeat Adventure", "Exceptional Fit", "Hidden Beauty".
 6.  "imageSearchQuery": A concise but effective string of 2-4 keywords for the user to find compelling and representative images of this destination on Google Images. THIS IS CRITICAL for fetching a good image later.
 7.  "imageUrl": Set this to an empty string (""). It will be populated by a different service later.

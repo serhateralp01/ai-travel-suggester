@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DestinationSuggestion } from '../src/types';
 // import { ExternalLinkIcon } from './icons/ExternalLinkIcon'; // We will define a simple one here
 // import { MapPinIcon, GlobeAltIcon, BuildingLibraryIcon } from './icons/SuggestionCardIcons'; // Placeholder for now
@@ -20,6 +20,7 @@ interface DestinationCardProps {
 }
 
 export const DestinationCard: React.FC<DestinationCardProps> = ({ suggestion }) => {
+  const [isDetailedReasoningExpanded, setIsDetailedReasoningExpanded] = useState(false);
   const googleImageSearchUrl = suggestion.imageSearchQuery 
     ? `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(suggestion.imageSearchQuery)}` 
     : `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(suggestion.name + " landscape scenery travel")}`;
@@ -43,14 +44,34 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({ suggestion }) 
       <div className="p-5 flex flex-col flex-grow">
         <h3 className="text-2xl font-bold text-sky-400 mb-2">{suggestion.name}</h3>
         
-        <div className="mb-3 space-y-1 text-sm text-slate-300">
-            <p className="flex items-start"><BuildingLibraryIcon className="w-4 h-4 mr-2 mt-0.5 shrink-0 text-sky-500" /> <strong>Suitability:</strong> {suggestion.suitability}</p>
+        <div className="mb-3 space-y-2 text-sm text-slate-300">
+            <p className="flex items-start">
+              <BuildingLibraryIcon className="w-4 h-4 mr-2 mt-0.5 shrink-0 text-sky-500" /> 
+              <span className="font-semibold mr-1">Suitability:</span> 
+              <span className="bg-sky-700/50 text-sky-300 px-2 py-0.5 rounded-md text-xs font-medium">
+                {suggestion.suitability}
+              </span>
+            </p>
             <p className="flex items-start"><MapPinIcon className="w-4 h-4 mr-2 mt-0.5 shrink-0 text-sky-500" /> <strong>Airports:</strong> {suggestion.nearestAirports}</p>
         </div>
 
         <p className="text-slate-400 text-sm mb-2 flex-grow leading-relaxed">{suggestion.description}</p>
         <p className="text-xs text-slate-500 mb-3 italic"><strong>Match Reason:</strong> {suggestion.matchReason}</p>
-        <p className="text-sm text-slate-300 bg-slate-700/50 p-3 rounded-md mb-4">{suggestion.detailedReasoning}</p>
+        
+        {/* Collapsible Detailed Reasoning */}
+        <div className="mb-4">
+          <p className={`text-sm text-slate-300 bg-slate-700/50 p-3 rounded-md ${isDetailedReasoningExpanded ? '' : 'line-clamp-3'}`}>
+            {suggestion.detailedReasoning}
+          </p>
+          {suggestion.detailedReasoning && suggestion.detailedReasoning.length > 150 && ( // Show button only if text is likely to be clamped
+            <button 
+              onClick={() => setIsDetailedReasoningExpanded(!isDetailedReasoningExpanded)}
+              className="text-xs text-sky-400 hover:text-sky-300 mt-1"
+            >
+              {isDetailedReasoningExpanded ? 'Read Less' : 'Read More'}
+            </button>
+          )}
+        </div>
 
         <div className="mt-auto pt-4 border-t border-slate-700 space-y-2">
             <a 
