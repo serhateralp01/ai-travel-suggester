@@ -5,7 +5,7 @@ import { LoadingSpinner } from './components/LoadingSpinner';
 import { ErrorDisplay } from './components/ErrorDisplay';
 import { PlaneIcon } from './components/icons/PlaneIcon';
 import { getTravelSuggestions } from './services/openaiService';
-import { UserPreferences, DestinationSuggestion } from './types';
+import { UserPreferences, DestinationSuggestion } from './src/types';
 import { DEFAULT_PREFERENCES } from './constants';
 
 const App: React.FC = () => {

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { DestinationSuggestion } from '../types';
+import { DestinationSuggestion } from '../src/types';
 import { AirportIcon } from './icons/AirportIcon'; // Assuming you'll create this icon
 
 interface DestinationCardProps {

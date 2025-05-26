@@ -1,5 +1,5 @@
 
-import { SelectOption } from './types';
+import { SelectOption } from './src/types';
 
 export const HOLIDAY_TYPES: SelectOption[] = [
   { value: "Relaxation", label: "Relaxation (e.g., beach, spa)" },

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { UserPreferences, SelectOption } from '../types';
+import { UserPreferences, SelectOption } from '../src/types';
 import { HOLIDAY_TYPES, BUDGET_OPTIONS, COMPANION_OPTIONS, CLIMATE_OPTIONS, DURATION_OPTIONS } from '../constants';
 import { SparklesIcon } from './icons/SparklesIcon';
 import { ResetIcon } from './icons/ResetIcon';

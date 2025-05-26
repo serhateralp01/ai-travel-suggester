@@ -5,10 +5,6 @@ export default defineConfig(({ mode }) => {
     // @ts-ignore
     const env = loadEnv(mode, process.cwd(), '');
     return {
-        define: {
-            // @ts-ignore
-            'process.env.OPENAI_API_KEY': JSON.stringify(env.OPENAI_API_KEY),
-        },
         plugins: [react()],
     };
 });
