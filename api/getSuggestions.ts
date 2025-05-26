@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import type { UserPreferences, DestinationSuggestion } from '../src/types'; // Adjusted path
+import type { UserPreferences, DestinationSuggestion } from '../src/types';
 
 // Ensure you have OPENAI_API_KEY set in your Vercel project's environment variables
 const API_KEY = process.env.OPENAI_API_KEY;
@@ -37,6 +37,7 @@ export default async function handler(
 
   const prompt = `
 You are an expert travel advisor. Based on the following user preferences, suggest 5 DIVERSE and DISTINCT travel destinations.
+Consider the typical weather and events for the specified travel month if provided. If "Any" month is selected, use general suitability based on typical best times to visit considering the other preferences.
 It is crucial that each suggestion is unique and offers a different type of experience or geographical focus, even if some core preferences overlap.
 Aim for a global spread where appropriate, including Europe, Asia, the Americas, Africa, and Oceania.
 Challenge yourself to include at least one or two "off-the-beaten-path" or less obvious options that are still highly relevant and accurate matches.
@@ -49,7 +50,8 @@ For each destination, provide:
 4.  "detailedReasoning": More in-depth valuable comments (2-3 sentences) explaining specific aspects that make it a great choice. Clearly articulate how unique features of the destination directly address MULTIPLE user preferences. Avoid generic statements.
 5.  "suitability": A qualitative assessment of how well the destination matches (e.g., "Excellent Match", "Strong Contender", "Unique Gem", "Good Alternative").
 6.  "imageUrl": A placeholder image URL using Picsum Photos. Format it as "https://picsum.photos/seed/DESTINATION_NAME_SLUG/600/400", where DESTINATION_NAME_SLUG is a URL-friendly version of the destination name (e.g., for "Bali, Indonesia", use "bali-indonesia").
-7.  "nearestAirports": A string listing 1-3 major international or well-connected regional airports, including their IATA codes (e.g., "Paris Charles de Gaulle (CDG), Paris Orly (ORY)", "Tokyo Narita (NRT), Tokyo Haneda (HND)").
+7.  "imageSearchQuery": A short string of 2-4 ideal keywords for finding representative images of this destination on Google Images (e.g., "Eiffel Tower Paris night", "Kyoto Arashiyama bamboo forest").
+8.  "nearestAirports": A string listing 1-3 major international or well-connected regional airports, including their IATA codes (e.g., "Paris Charles de Gaulle (CDG), Paris Orly (ORY)", "Tokyo Narita (NRT), Tokyo Haneda (HND)").
 
 User Preferences:
 - Holiday Type: ${preferences.holidayType}
@@ -58,6 +60,7 @@ User Preferences:
 - Preferred Climate: ${preferences.climate}
 - Interests/Activities: ${preferences.interests || "Not specified, focus on primary preferences"}
 - Trip Duration: ${preferences.duration}
+- Preferred Travel Month: ${preferences.travelMonth || 'Any'}
 
 Return your response as a valid JSON array of 5 objects. Each object must represent a destination and strictly follow this structure:
 {
@@ -67,6 +70,7 @@ Return your response as a valid JSON array of 5 objects. Each object must repres
   "detailedReasoning": "string",
   "suitability": "string",
   "imageUrl": "string",
+  "imageSearchQuery": "string",
   "nearestAirports": "string"
 }
 
@@ -121,6 +125,7 @@ The "nearestAirports" should be practical for travelers.
         typeof item.detailedReasoning === 'string' &&
         typeof item.suitability === 'string' &&
         typeof item.imageUrl === 'string' &&
+        typeof item.imageSearchQuery === 'string' &&
         typeof item.nearestAirports === 'string'
       )) {
         const suggestionsWithFullUrls = parsedData.map((item: any) => {
@@ -128,6 +133,7 @@ The "nearestAirports" should be practical for travelers.
           return {
             ...item,
             imageUrl: `https://picsum.photos/seed/${generateSlug(item.name)}/600/400`,
+            imageSearchQuery: item.imageSearchQuery,
             googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${destinationNameEncoded}`,
             tripAdvisorUrl: `https://www.tripadvisor.com/Search?q=${destinationNameEncoded}`
           } as DestinationSuggestion;
