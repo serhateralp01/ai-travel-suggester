@@ -49,10 +49,12 @@ const RefinedExternalLinkIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props)
 
 interface DestinationCardProps {
   suggestion: DestinationSuggestion;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
 }
 
-export const DestinationCard: React.FC<DestinationCardProps> = ({ suggestion }) => {
-  const [isDetailedReasoningExpanded, setIsDetailedReasoningExpanded] = useState(false);
+export const DestinationCard: React.FC<DestinationCardProps> = ({ suggestion, isExpanded, onToggleExpand }) => {
+  const [isDetailedReasoningExpandedInternally, setIsDetailedReasoningExpandedInternally] = useState(false);
   const googleImageSearchUrl = suggestion.imageSearchQuery 
     ? `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(suggestion.imageSearchQuery)}` 
     : `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(suggestion.name + " landscape scenery travel")}`;
@@ -73,20 +75,62 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({ suggestion }) 
     ) : null
   );
 
+  if (!isExpanded) {
+    // COLLAPSED STATE: Small, wide card
+    return (
+      <button
+        onClick={onToggleExpand}
+        aria-expanded="false"
+        aria-label={`View details for ${suggestion.name}`}
+        className="w-full text-left bg-slate-800/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:bg-slate-700/90 hover:shadow-sky-600/40 ring-1 ring-slate-700/50 hover:ring-sky-500/70 flex items-center p-4 space-x-4 group"
+      >
+        <div className="flex-shrink-0">
+          <BlurHashImage 
+            src={suggestion.imageUrl}
+            blurHash={suggestion.blurHash}
+            alt={`Thumbnail of ${suggestion.name}`}
+            className="w-28 h-20 object-cover rounded-md ring-1 ring-slate-600/50 group-hover:ring-sky-500/80 transition-all duration-300"
+            hashWidth={32}
+            hashHeight={20} // Adjusted for a 16:10 aspect ratio (approx for w-28 h-20)
+          />
+        </div>
+        <div className="flex-grow">
+          <h3 className="text-lg font-bold text-sky-400 group-hover:text-sky-300 transition-colors duration-300 tracking-tight truncate" title={suggestion.name}>{suggestion.name}</h3>
+          {suggestion.suitability && (
+            <span className="mt-1 mb-1.5 inline-block bg-sky-600/50 text-sky-200 px-2 py-0.5 rounded-full text-xs font-medium tracking-wide group-hover:bg-sky-500/60 transition-colors duration-300">
+              {suggestion.suitability}
+            </span>
+          )}
+          <p className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors duration-300 line-clamp-2 leading-snug">
+            {suggestion.description} 
+          </p>
+        </div>
+        <div className="flex-shrink-0 ml-auto pl-3">
+            <SuitabilityIcon className="w-8 h-8 text-sky-500/70 group-hover:text-sky-400 group-hover:scale-110 transition-all duration-300" />
+        </div>
+      </button>
+    );
+  }
+
+  // EXPANDED STATE: Full card details (similar to before)
   return (
-    <div className="bg-slate-800/90 backdrop-blur-sm rounded-xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300 hover:shadow-sky-600/60 ring-1 ring-slate-700/50 hover:ring-sky-500/70">
+    <div className="bg-slate-800/90 backdrop-blur-sm rounded-xl shadow-2xl overflow-hidden flex flex-col ring-1 ring-slate-700/50 animate-fadeInUp">
+       {/* Button to collapse, styled differently or positioned if needed */}
+       <button onClick={onToggleExpand} aria-expanded="true" aria-label={`Hide details for ${suggestion.name}`} className="absolute top-4 right-4 z-10 p-2 bg-slate-700/50 hover:bg-sky-600/70 rounded-full text-sky-300 hover:text-white transition-all duration-200">
+        <ChevronUpIcon className="w-5 h-5" />
+      </button>
       <BlurHashImage 
         src={suggestion.imageUrl}
         blurHash={suggestion.blurHash}
         alt={`Scenic view of ${suggestion.name}`}
-        className="w-full h-52 object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+        className="w-full h-52 md:h-64 object-cover" // Slightly taller image for expanded view
         hashWidth={32}
-        hashHeight={20}
+        hashHeight={16} // Adjusted for a wider aspect ratio if h-64 is wider
       />
       <div className="p-6 flex flex-col flex-grow">
-        <h3 className="text-2xl font-bold text-sky-400 mb-3 tracking-tight">{suggestion.name}</h3>
+        <h3 className="text-3xl font-bold text-sky-400 mb-3 tracking-tight">{suggestion.name}</h3>
         
-        <div className="mb-4 border-b border-slate-700 pb-3">
+        <div className="mb-4 border-b border-slate-700 pb-4">
           {renderListItem(SuitabilityIcon, "Suitability", suggestion.suitability, true)}
           {renderListItem(AirportIcon, "Airports", suggestion.nearestAirports)}
         </div>
@@ -94,31 +138,46 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({ suggestion }) 
         <p className="text-slate-300 text-sm mb-3 leading-relaxed">{suggestion.description}</p>
         
         {suggestion.matchReason && (
-            <p className="text-xs text-slate-400 mb-4 italic bg-slate-700/40 p-2.5 rounded-md">
+            <p className="text-sm text-slate-400 mb-4 italic bg-slate-700/40 p-3 rounded-md leading-relaxed">
                 <span className="font-semibold not-italic text-sky-400/80">Match Insight:</span> {suggestion.matchReason}
             </p>
         )}
         
+        {/* Internal toggle for detailedReasoning can remain if text is very long */}
         {suggestion.detailedReasoning && (
           <div className="mb-4">
-            <div className={`text-sm text-slate-300 overflow-hidden transition-all duration-300 ease-in-out ${isDetailedReasoningExpanded ? 'max-h-96' : 'max-h-16 line-clamp-3'}`}>
+            <div className={`text-sm text-slate-300 overflow-hidden transition-all duration-300 ease-in-out ${isDetailedReasoningExpandedInternally ? 'max-h-[1000px]' : 'max-h-20 line-clamp-3'}`}> {/* Increased max-h for expanded state */} 
               {suggestion.detailedReasoning}
             </div>
-            {suggestion.detailedReasoning.length > 120 && ( // Adjusted length threshold for toggle
+            {suggestion.detailedReasoning.length > 100 && ( // Show toggle if text is long enough
               <button 
-                onClick={() => setIsDetailedReasoningExpanded(!isDetailedReasoningExpanded)}
+                onClick={() => setIsDetailedReasoningExpandedInternally(!isDetailedReasoningExpandedInternally)}
                 className="text-xs text-sky-400 hover:text-sky-300 mt-2 flex items-center font-medium group"
               >
-                {isDetailedReasoningExpanded ? 'Read Less' : 'Read More'}
-                {isDetailedReasoningExpanded ? 
+                {isDetailedReasoningExpandedInternally ? 'Read Less' : 'Read More'}
+                {isDetailedReasoningExpandedInternally ? 
                   <ChevronUpIcon className="w-4 h-4 ml-1 group-hover:translate-y-[-1px] transition-transform" /> : 
-                  <ChevronDownIcon className="w-4 h-4 ml-1 group-hover:translate-y-[1px] transition-transform" />}
+                  <ChevronDownIcon className="w-4 h-4 ml-1 group-hover:translate-y-[1px] transition-transform" />} 
               </button>
             )}
           </div>
         )}
 
-        <div className="mt-auto pt-5 border-t border-slate-700 space-y-2.5">
+        {suggestion.mustDoActivities && suggestion.mustDoActivities.length > 0 && (
+            <div className="mb-5">
+                <h4 className="text-md font-semibold text-sky-300 mb-2">Must-Do Activities:</h4>
+                <ul className="list-disc list-inside pl-1 space-y-1.5">
+                    {suggestion.mustDoActivities.map(activity => (
+                        <li key={activity} className="text-sm text-slate-300 flex items-start">
+                            <SuitabilityIcon className="w-4 h-4 mr-2.5 text-emerald-400 shrink-0 mt-1" /> 
+                            {activity}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        )}
+
+        <div className="mt-auto pt-5 border-t border-slate-700 space-y-3">
           {[ { href: suggestion.googleMapsUrl, label: "View on Google Maps" },
              { href: suggestion.tripAdvisorUrl, label: "Explore on TripAdvisor" },
              { href: googleImageSearchUrl, label: "Find Images on Google" }
@@ -128,7 +187,7 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({ suggestion }) 
               href={link.href} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-sm text-sky-400 hover:text-sky-300 transition-colors duration-150 ease-in-out flex items-center group"
+              className="text-sm text-sky-400 hover:text-sky-300 hover:underline transition-colors duration-150 ease-in-out flex items-center group"
               aria-label={link.label}
             >
               {link.label} <RefinedExternalLinkIcon className="w-4 h-4 ml-1.5 opacity-70 group-hover:opacity-100 transition-opacity" />

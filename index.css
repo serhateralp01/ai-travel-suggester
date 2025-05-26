@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Add any other global base styles or custom component styles here if needed */
+body {
+  /* Example: font-family: 'Inter', sans-serif; (if you set up a custom font) */
+  /* Background is handled by App.tsx with Tailwind classes */
+}
+
+/* Ensure smooth scrolling for anchor links if you use them for navigation */
+html {
+  scroll-behavior: smooth;
+} 

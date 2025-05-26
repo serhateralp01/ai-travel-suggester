@@ -9,6 +9,7 @@ export interface UserPreferences {
 }
 
 export interface DestinationSuggestion {
+  id?: string; // Client-side ID for UI purposes
   name: string;
   description: string;
   matchReason: string; // A concise summary

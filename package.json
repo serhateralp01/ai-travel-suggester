@@ -20,6 +20,7 @@
     "@types/node": "^22.14.0",
     "@types/node-fetch": "^2.6.12",
     "@types/react": "^19.1.5",
+    "@types/react-dom": "^19.1.5",
     "@vercel/node": "^5.1.16",
     "@vitejs/plugin-react": "^4.5.0",
     "typescript": "~5.7.2",
