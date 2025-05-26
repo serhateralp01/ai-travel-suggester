@@ -9,12 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "node-fetch": "^3.3.2",
     "openai": "^4.103.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "unsplash-js": "^7.0.19"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
+    "@types/node-fetch": "^2.6.12",
     "@types/react": "^19.1.5",
     "@vercel/node": "^5.1.16",
     "@vitejs/plugin-react": "^4.5.0",

@@ -7,6 +7,7 @@ import {
     CLIMATE_OPTIONS, 
     DURATION_OPTIONS,
     MONTHS,
+    DEFAULT_PREFERENCES,
 } from '../src/constants';
 import { SparklesIcon } from './icons/SparklesIcon';
 import { ResetIcon } from './icons/ResetIcon';
@@ -52,9 +53,13 @@ const SelectField: React.FC<SelectFieldProps> = ({ id, label, value, onChange, o
 
 export const PreferenceForm: React.FC<PreferenceFormProps> = ({ initialPreferences, onSubmit, onReset, isLoading }) => {
   const [currentPreferences, setCurrentPreferences] = useState<UserPreferences>(initialPreferences);
+  const [isSurpriseMode, setIsSurpriseMode] = useState<boolean>(false);
 
   const handleChange = useCallback((e: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    if (name === 'budget' || name === 'companions') {
+      setIsSurpriseMode(false);
+    }
     setCurrentPreferences(prev => ({
       ...prev,
       [name]: value,
@@ -68,8 +73,25 @@ export const PreferenceForm: React.FC<PreferenceFormProps> = ({ initialPreferenc
 
   const handleResetClick = useCallback(() => {
     setCurrentPreferences(initialPreferences);
+    setIsSurpriseMode(false);
     onReset();
   }, [initialPreferences, onReset]);
+
+  const handleSurpriseMeClick = useCallback(() => {
+    const surprisePrefs: UserPreferences = {
+      ...DEFAULT_PREFERENCES,
+      budget: currentPreferences.budget,
+      companions: currentPreferences.companions,
+      holidayType: 'SURPRISE_ME',
+      climate: 'SURPRISE_ME',
+      interests: 'SURPRISE_ME',
+      duration: 'SURPRISE_ME',
+      travelMonth: 'SURPRISE_ME',
+    };
+    setCurrentPreferences(surprisePrefs);
+    setIsSurpriseMode(true);
+    onSubmit(surprisePrefs);
+  }, [currentPreferences.budget, currentPreferences.companions, onSubmit]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -80,7 +102,7 @@ export const PreferenceForm: React.FC<PreferenceFormProps> = ({ initialPreferenc
           value={currentPreferences.holidayType}
           onChange={handleChange}
           options={HOLIDAY_TYPES}
-          disabled={isLoading}
+          disabled={isLoading || isSurpriseMode}
         />
         <SelectField
           id="budget"
@@ -104,7 +126,7 @@ export const PreferenceForm: React.FC<PreferenceFormProps> = ({ initialPreferenc
           value={currentPreferences.climate}
           onChange={handleChange}
           options={CLIMATE_OPTIONS}
-          disabled={isLoading}
+          disabled={isLoading || isSurpriseMode}
         />
         <SelectField
           id="duration"
@@ -112,7 +134,7 @@ export const PreferenceForm: React.FC<PreferenceFormProps> = ({ initialPreferenc
           value={currentPreferences.duration}
           onChange={handleChange}
           options={DURATION_OPTIONS}
-          disabled={isLoading}
+          disabled={isLoading || isSurpriseMode}
         />
         <SelectField
           id="travelMonth"
@@ -120,7 +142,7 @@ export const PreferenceForm: React.FC<PreferenceFormProps> = ({ initialPreferenc
           value={currentPreferences.travelMonth || 'Any'}
           onChange={handleChange}
           options={MONTHS}
-          disabled={isLoading}
+          disabled={isLoading || isSurpriseMode}
         />
       </div>
 
@@ -134,14 +156,23 @@ export const PreferenceForm: React.FC<PreferenceFormProps> = ({ initialPreferenc
           rows={3}
           value={currentPreferences.interests}
           onChange={handleChange}
-          disabled={isLoading}
+          disabled={isLoading || isSurpriseMode}
           className="mt-1 block w-full shadow-sm sm:text-sm bg-slate-700 border-slate-600 focus:ring-sky-500 focus:border-sky-500 rounded-md text-slate-100 placeholder-slate-400 disabled:bg-slate-600 disabled:text-slate-400 disabled:cursor-not-allowed"
           placeholder="Tell us more about what you'd like to do..."
         />
       </div>
 
       <div className="flex flex-col sm:flex-row sm:justify-end sm:space-x-3 space-y-3 sm:space-y-0 pt-4">
-         <button
+        <button
+          type="button"
+          onClick={handleSurpriseMeClick}
+          disabled={isLoading}
+          className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-amber-500 shadow-sm text-base font-medium rounded-md text-amber-400 bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-amber-500 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed order-first sm:order-none mb-3 sm:mb-0"
+        >
+          <SparklesIcon className="w-5 h-5 mr-2 -ml-1 text-amber-400" />
+          Surprise Me!
+        </button>
+        <button
           type="button"
           onClick={handleResetClick}
           disabled={isLoading}
